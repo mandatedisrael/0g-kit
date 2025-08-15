@@ -1,9 +1,34 @@
-# 0G Kit - Simplified SDK for 0G Decentralized AI Network
+# 0G Kit - Simplified SDK for easy integration!
 
-A lightweight, developer-friendly SDK that makes it easy to interact with the 0G decentralized AI network. Go from + lines of complex setup to just 2 lines of code!
+A developer-friendly SDK that makes it easy to interact with the 0G decentralized AI network. Go from multiple lines of complex setup to just 2 lines of code and get any 0G infrastructure integrated into your app!
 
+## What Complexity Does 0G Kit Handle For You? 
 
-## 📦 What's Included
+The 0G Kit abstracts away the following complex technical details:
+
+• **Broker Initialization** - No need to manually create and configure the 0G Compute Network broker with ethers.js providers, wallets etc
+• **Provider Discovery** - Automatic service discovery and provider selection instead of manually calling `broker.inference.listService()`
+• **Provider Acknowledgment** - Automatic on-chain provider acknowledgment via `broker.inference.acknowledgeProviderSigner()`
+• **Service Metadata Retrieval** - No need to manually fetch endpoint and model information with `broker.inference.getServiceMetadata()`
+• **Request Header Generation** - Automatic generation of single-use authenticated headers via `broker.inference.getRequestHeaders()`
+• **HTTP Request Management** - Handles all the fetch API calls, error handling, and response parsing
+• **Response Verification** - Automatic response processing and verification for TEE-enabled services
+• **Fee Settlement** - Automatic micropayment handling and fee settlement
+• **Account Management** - Simplified balance checking, deposits, and withdrawals without direct ledger interactions
+• **Error Handling** - Comprehensive error handling for network issues, insufficient funds, and provider failures
+• **Retry Logic** - Built-in retry mechanisms for failed requests
+• **Timeout Management** - Automatic request timeout handling and cleanup
+
+## What You Get With 0G Kit
+
+**- Focus on Your App, Not Infrastructure Logic**
+With 0G Kit, you get a streamlined development experience that eliminates the need to understand complex blockchain interactions, provider management, and network protocols. Instead of spending time on infrastructure setup and maintenance, you can focus entirely on building your applications😉.
+
+**- Faster Integration, Easier Deployment**
+The complexities of 0G Compute Network are abstracted away, giving you a clean, familiar API that works like any other SDK. No need to worry about broker initialization, provider discovery, or fee settlement - it's all handled automatically behind the scenes.
+
+-------
+**TLDR; You get**
 - ✅ **Simple 2-line setup** - instant and easy integration into any project!
 - ✅ **Automatic retries** - Built-in resilience for network issues
 - ✅ **Balance management** - Easy deposit/withdraw operations without worrying about the technicalities
@@ -13,19 +38,60 @@ A lightweight, developer-friendly SDK that makes it easy to interact with the 0G
 - ✅ **Logging** - Configurable logging for debugging
 - ✅ **Timeout protection** - Prevents hanging requests
 
+## 🚀 Future Releases
+
+- 🔄 **0G Storage Support** - Decentralized storage integration coming soon
+- 🔄 **0G Data Availability** - Data availability layer support in development
+
+
 ### Installation
 
-```bash
-npm install 0g-kit
-```
+- Install 0G kit `npm install 0g-kit`
+
+- Get some 0G faucet from [Link](https://faucet.0g.ai/)
+- Add your EVM private key to .env 
+
+...and voila that's all!
+
+
+
 
 ### Basic Usage (2 lines!)
 
 ```javascript
 import { chat } from '0g-kit';
-
-await chat('Hello, how are you?').then(console.log);
+const response = await chat('Hello, how are you?');
 ```
+
+### Model-Specific Functions
+
+```javascript
+// Use DeepSeek model specifically
+import { useDeepseek } from '0g-kit';
+const response = await useDeepseek('Hello, how are you?')
+```
+
+```javascript
+// Use Llama model specifically
+import { useLlama } from '0g-kit';
+const response = await useLlama('Hello, how are you?')
+```
+
+### Service Discovery
+
+```javascript
+// Get list of available models and providers
+import { getAvailableModels } from '0g-kit';
+const models = await getAvailableModels();
+```
+
+```javascript
+// Get detailed service information
+import { listServices } from '0g-kit';
+const services = await listServices();
+console.log('Service details:', services);
+```
+
 ### Manage Your Balance
 
 ```javascript
