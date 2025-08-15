@@ -1,7 +1,7 @@
 {
   "name": "0G-kit",
   "version": "1.0.0",
-  "description": "A 2 liner for implementing 0G infrastructure",
+  "description": "A simple 2 liner for integrating any 0G infrastructure",
   "type": "module",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
