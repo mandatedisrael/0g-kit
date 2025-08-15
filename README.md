@@ -1,8 +1,17 @@
 # 0G Kit - Simplified SDK for 0G Decentralized AI Network
 
-A lightweight, developer-friendly SDK that makes it easy to interact with the 0G decentralized AI network. Go from 50+ lines of complex setup to just 2 lines of code!
+A lightweight, developer-friendly SDK that makes it easy to interact with the 0G decentralized AI network. Go from + lines of complex setup to just 2 lines of code!
 
-## 🚀 Quick Start
+
+## 📦 What's Included
+- ✅ **Simple 2-line setup** - instant and easy integration into any project!
+- ✅ **Automatic retries** - Built-in resilience for network issues
+- ✅ **Balance management** - Easy deposit/withdraw operations without worrying about the technicalities
+- ✅ **Multiple AI models** - Support for All providers on 0G inference!
+- ✅ **TypeScript support** - Full type definitions included
+- ✅ **Error handling** - Clear, actionable error messages
+- ✅ **Logging** - Configurable logging for debugging
+- ✅ **Timeout protection** - Prevents hanging requests
 
 ### Installation
 
@@ -13,94 +22,47 @@ npm install 0g-kit
 ### Basic Usage (2 lines!)
 
 ```javascript
-import { initZeroG, chat } from '0g-kit';
+import { chat } from '0g-kit';
 
-// 1. Initialize with your private key
-initZeroG({ privateKey: '0x1234...' });
-
-// 2. Start chatting with AI!
-const response = await chat('Hello, how are you?');
-console.log(response); // "Hello! I'm doing well, thank you for asking..."
+await chat('Hello, how are you?').then(console.log);
 ```
-
-## 📖 Full Documentation
-
-### Initialization
+### Manage Your Balance
 
 ```javascript
-import { initZeroG } from '0g-kit';
+// check balance
+import { getBalance } from '0g-kit';
+await getBalance().then(console.log(`Balance: ${balance} OG`));
+```
 
-// Basic setup
-initZeroG({
-  privateKey: '0x1234567890abcdef...' // Your Ethereum private key
-});
+```javascript
+// Deposit 0.5 0G 4rm wallet to broker account
+import { deposit } from '0g-kit';
+await deposit(0.5); 
+```
+
+```javascript
+// Withdraw 0.2 0G from your broker account to wallet
+import { withdraw } from '0g-kit';
+await withdraw(0.2); 
+```
+
+### Advance User customization
+```javascript
+import { initZeroG, chat  } from '0g-kit';
 
 // Advanced setup with custom options
 initZeroG({
   privateKey: '0x1234567890abcdef...',
   rpcUrl: 'https://evmrpc-testnet.0g.ai',
   autoDeposit: true,
-  defaultModel: 'deepseek-chat',
+  defaultModel: 'deepseek-chat', 
   timeout: 30000,
   retries: 3,
-  logLevel: 'info'
-});
-```
-
-### Chat with AI
-
-```javascript
-import { chat } from '0g-kit';
-
-// Simple chat
-const response = await chat('What is the capital of France?');
-
-// Advanced chat with options
-const response = await chat('Write a poem about coding', {
-  model: 'deepseek-chat',
-  temperature: 0.7,
-  maxTokens: 500,
-  timeout: 60000,
-  retries: 5
-});
-```
-
-### Manage Your Balance
-
-```javascript
-import { getBalance, deposit, withdraw } from '0g-kit';
-
-// Check your balance
-const balance = await getBalance();
-console.log(`Balance: ${balance} OG`);
-
-// Deposit funds
-await deposit(0.5); // Deposit 0.5 OG
-
-// Withdraw funds
-await withdraw(0.2); // Withdraw 0.2 OG
-```
-
-### Advanced Usage
-
-```javascript
-import { chatAdvanced } from '0g-kit';
-
-// Get detailed response with metadata
-const response = await chatAdvanced('Explain quantum computing', {
-  model: 'deepseek-chat',
-  temperature: 0.3
+  logLevel: 'info' 
 });
 
-console.log(response);
-// {
-//   content: "Quantum computing is...",
-//   model: "deepseek-chat",
-//   provider: "auto-selected",
-//   requestId: "uuid-here",
-//   timestamp: 1703123456789
-// }
 ```
+
 
 ## ⚙️ Configuration Options
 
@@ -114,16 +76,6 @@ console.log(response);
 | `retries` | number | `3` | Number of retry attempts |
 | `logLevel` | string | `info` | Logging level (`debug`, `info`, `warn`, `error`, `silent`) |
 
-## 🎯 Chat Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `model` | string | `auto` | AI model to use |
-| `provider` | string | `auto` | Specific AI provider address |
-| `temperature` | number | `0.7` | Response creativity (0.0-1.0) |
-| `maxTokens` | number | `1000` | Maximum response length |
-| `timeout` | number | `30000` | Request timeout |
-| `retries` | number | `3` | Retry attempts |
 
 ## 🔧 Error Handling
 
@@ -145,16 +97,18 @@ try {
 }
 ```
 
-## 📦 What's Included
+## 🎯 Chat Options 
+### will be implemented once 0G activates the feature on each models ⚠️
 
-- ✅ **Simple 2-line setup** - Initialize and start chatting
-- ✅ **Automatic retries** - Built-in resilience for network issues
-- ✅ **Balance management** - Easy deposit/withdraw operations
-- ✅ **Multiple AI models** - Support for various AI providers
-- ✅ **TypeScript support** - Full type definitions included
-- ✅ **Error handling** - Clear, actionable error messages
-- ✅ **Logging** - Configurable logging for debugging
-- ✅ **Timeout protection** - Prevents hanging requests
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `model` | string | `auto` | AI model to use |
+| `provider` | string | `auto` | Specific AI provider address |
+| `temperature` | number | `0.7` | Response creativity (0.0-1.0) |
+| `maxTokens` | number | `1000` | Maximum response length |
+| `timeout` | number | `30000` | Request timeout |
+| `retries` | number | `3` | Retry attempts |
+
 
 ## 🛠️ Development
 
@@ -172,16 +126,7 @@ npm test
 npm run dev
 ```
 
-## 📄 License
-
-MIT License - see LICENSE file for details.
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
----
-
-**From 50+ lines to 2 lines** - That's the power of 0G Kit! 🚀
-
-# 0g-kit

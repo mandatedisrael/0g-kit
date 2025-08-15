@@ -113,6 +113,33 @@ export class ZeroGKit {
     }
   }
 
+  async getLockedBalance(): Promise<string> {
+    
+    try {
+      const broker = await this.getBroker();
+      const account = await broker.ledger.getLedger();
+      const lockedBalance = ethers.formatEther(account.locked);
+      logger.debug('Locked Balance: ', { lockedBalance });
+      return lockedBalance;
+    } catch (error) {
+      logger.error('Failed to get the locked balance', error as Error);
+      throw new NetworkError('Failed to retrieve balance', error as Error);
+    }
+  }
+
+  async getAvailableBalance(): Promise<string> {
+    
+    try {
+      const broker = await this.getBroker();
+      const account = await broker.ledger.getLedger();
+      const lockedBalance = ethers.formatEther(account.totalBalance);
+      logger.debug('Locked Balance: ', { lockedBalance });
+      return lockedBalance;
+    } catch (error) {
+      logger.error('Failed to get the locked balance', error as Error);
+      throw new NetworkError('Failed to retrieve balance', error as Error);
+    }
+  }
   async deposit(amount: number): Promise<void> {
     validateAmount(amount, 'deposit');
 

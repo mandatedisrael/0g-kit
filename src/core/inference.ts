@@ -503,14 +503,60 @@ export async function getAvailableModels(): Promise<Array<{model: string, provid
   return models;
 }
 
-export async function chatAdvanced(message: string, options: ChatOptions = {}): Promise<ChatResponse> {
-  const content = await chat(message, options);
+export async function listServices(): Promise<Array<{
+  provider: string;
+  serviceType: string;
+  url: string;
+  inputPrice: bigint;
+  outputPrice: bigint;
+  updatedAt: bigint;
+  model: string;
+  verifiability: string;
+}>> {
+  ensureInitialized();
+  const broker = await globalClient!.getBroker();
   
-  return {
-    content,
-    model: options.model || 'deepseek-chat',
-    provider: options.provider || 'auto-selected',
-    requestId: uuidv4(),
-    timestamp: Date.now()
-  };
+  const services = await withRetry(async () => {
+    logger.debug('Fetching available services...');
+    const serviceList = await broker.inference.listService();
+    
+    if (!serviceList || serviceList.length === 0) {
+      throw new NetworkError('No AI inference services available');
+    }
+    
+    logger.debug(`Found ${serviceList.length} available services`);
+    return serviceList;
+  }, 3);
+
+  const fullServices: Array<{
+    provider: string;
+    serviceType: string;
+    url: string;
+    inputPrice: bigint;
+    outputPrice: bigint;
+    updatedAt: bigint;
+    model: string;
+    verifiability: string;
+  }> = [];
+  
+  for (const service of services) {
+    try {
+      fullServices.push({
+        provider: service.provider,
+        serviceType: service.serviceType,
+        url: service.url,
+        inputPrice: service.inputPrice,
+        outputPrice: service.outputPrice,
+        updatedAt: service.updatedAt,
+        model: service.model,
+        verifiability: service.verifiability
+      });
+    } catch (error) {
+      logger.debug(`Failed to get metadata for provider :`, error as Error);
+      continue;
+    }
+  }
+  
+  return fullServices;
 }
+

@@ -5,10 +5,12 @@ export {
   deposit, 
   withdraw, 
   getBalance,
-  chatAdvanced,
+  listServices,
   initZeroG,
   useDeepseek,
-  useLlama
+  useLlama,
+  getAvailableModels,
+
 } from './core/inference.js';
 
 export * from './types.js';
