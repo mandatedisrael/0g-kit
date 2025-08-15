@@ -55,9 +55,10 @@ The complexities of 0G Compute Network are abstracted away, giving you a clean, 
 - Install 0G kit `npm install 0g-kit`
 
 - Get some 0G faucet from [Link](https://faucet.0g.ai/)
+
 - Add your EVM private key to .env 
 
-...and voila that's all!
+...and voila that's all, start building on 0G!
 
 
 
@@ -170,6 +171,7 @@ try {
 ```
 
 ## 🎯 Chat Options 
+
 ### will be implemented once 0G activates the feature on each models ⚠️
 
 | Option | Type | Default | Description |
