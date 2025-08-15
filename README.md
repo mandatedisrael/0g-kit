@@ -7,16 +7,27 @@ A developer-friendly SDK that makes it easy to interact with the 0G decentralize
 The 0G Kit abstracts away the following complex technical details:
 
 • **Broker Initialization** - No need to manually create and configure the 0G Compute Network broker with ethers.js providers, wallets etc
+
 • **Provider Discovery** - Automatic service discovery and provider selection instead of manually calling `broker.inference.listService()`
+
 • **Provider Acknowledgment** - Automatic on-chain provider acknowledgment via `broker.inference.acknowledgeProviderSigner()`
+
 • **Service Metadata Retrieval** - No need to manually fetch endpoint and model information with `broker.inference.getServiceMetadata()`
+
 • **Request Header Generation** - Automatic generation of single-use authenticated headers via `broker.inference.getRequestHeaders()`
+
 • **HTTP Request Management** - Handles all the fetch API calls, error handling, and response parsing
+
 • **Response Verification** - Automatic response processing and verification for TEE-enabled services
+
 • **Fee Settlement** - Automatic micropayment handling and fee settlement
+
 • **Account Management** - Simplified balance checking, deposits, and withdrawals without direct ledger interactions
+
 • **Error Handling** - Comprehensive error handling for network issues, insufficient funds, and provider failures
+
 • **Retry Logic** - Built-in retry mechanisms for failed requests
+
 • **Timeout Management** - Automatic request timeout handling and cleanup
 
 ## What You Get With 0G Kit
@@ -37,11 +48,6 @@ The complexities of 0G Compute Network are abstracted away, giving you a clean, 
 - ✅ **Error handling** - Clear, actionable error messages
 - ✅ **Logging** - Configurable logging for debugging
 - ✅ **Timeout protection** - Prevents hanging requests
-
-## 🚀 Future Releases
-
-- 🔄 **0G Storage Support** - Decentralized storage integration coming soon
-- 🔄 **0G Data Availability** - Data availability layer support in development
 
 
 ### Installation
@@ -192,6 +198,10 @@ npm test
 npm run dev
 ```
 
+## 🚀 Future Releases
+
+- 🔄 **0G Storage Support** - Decentralized storage integration coming soon
+- 🔄 **0G Data Availability** - Data availability layer support in development
 
 ## 🤝 Contributing
 
