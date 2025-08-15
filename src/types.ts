@@ -19,7 +19,6 @@ export interface ZeroGConfig {
     retries?: number;        
   }
   
-  // ai response
   export interface ChatResponse {
     content: string;         
     model: string;          

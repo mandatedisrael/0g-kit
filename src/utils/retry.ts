@@ -1,44 +1,31 @@
-import { logger } from './logger';
+import { logger } from './logger.js';
 
 export async function withRetry<T>(
-  fn: () => Promise<T>,        
-  maxRetries: number = 3,      
-  delay: number = 1000,        
-  backoffMultiplier: number = 2 // 
+  operation: () => Promise<T>,
+  maxRetries: number = 3,
+  delay: number = 1000
 ): Promise<T> {
-  let lastError: Error = new Error('Unknown error');
+  let lastError: Error;
   
-  for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      logger.debug(`Attempt ${attempt}/${maxRetries + 1}`);
-      
-      const result = await fn();
-      
-      if (attempt > 1) {
-        logger.info(`Success on attempt ${attempt}`);
-      }
-      
-      return result;
-      
+      return await operation();
     } catch (error) {
       lastError = error as Error;
       
-     
-      if (attempt <= maxRetries) {
-        logger.warn(`Attempt ${attempt} failed, retrying in ${delay}ms`, {
-          error: (error as any).message,
-          nextDelay: delay * backoffMultiplier
-        });
-        
-        await new Promise(resolve => setTimeout(resolve, delay));
-        delay *= backoffMultiplier; 
+      if (attempt === maxRetries) {
+        logger.error(`Operation failed after ${maxRetries} attempts`, lastError);
+        throw lastError;
       }
+      
+      const waitTime = delay * Math.pow(2, attempt - 1); // Exponential backoff
+      logger.warn(`Attempt ${attempt} failed, retrying in ${waitTime}ms...`, lastError);
+      
+      await new Promise(resolve => setTimeout(resolve, waitTime));
     }
   }
   
-
-  logger.error(`All ${maxRetries + 1} attempts failed`);
-  throw lastError;
+  throw lastError!;
 }
 
 
@@ -49,7 +36,6 @@ export async function retryNetworkOperation<T>(
   return withRetry(
     fn,
     3,     
-    1000,  
-    2      // Double delay each time: 1s, 2s, 4s
+    1000   
   );
 }

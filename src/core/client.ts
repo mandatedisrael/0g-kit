@@ -1,32 +1,31 @@
 import { ethers } from "ethers";
 import { createZGComputeNetworkBroker } from "@0glabs/0g-serving-broker";
-import { ZeroGConfig } from '../types';
-import { ConfigurationError, NetworkError, InsufficientFundsError } from '../utils/errors';
-import { validateConfig, validateAmount } from '../utils/validations';
-import { logger } from '../utils/logger';
-import { withRetry } from '../utils/retry';
+import { ZeroGConfig } from '../types.js';
+import { ConfigurationError, NetworkError, InsufficientFundsError } from '../utils/errors.js';
+import { validateConfig, validateAmount } from '../utils/validation.js';
+import { logger } from '../utils/logger.js';
+import { withRetry } from '../utils/retry.js';
 
 export class ZeroGKit {
-  private broker: any = null;                    
-  private wallet!: ethers.Wallet;                 
-  private config: Required<ZeroGConfig>;         
-  private initialized: boolean = false;         
-  private initializing: boolean = false;        
+  private broker: any = null;
+  private wallet!: ethers.Wallet;
+  private config: Required<ZeroGConfig>;
+  private initialized: boolean = false;
+  private initializing: boolean = false;
   private initPromise: Promise<void> | null = null; 
 
   constructor(config: ZeroGConfig) {
-    // ✅ Check if config is valid first
+
     validateConfig(config);
     
-    // 🔧 Fill in default values
     this.config = {
       rpcUrl: "https://evmrpc-testnet.0g.ai",
-      autoDeposit: true,
-      defaultModel: "deepseek-chat", 
-      timeout: 30000,        // 30 seconds
+      autoDeposit: false,
+      defaultModel: "deepseek-chat",
+      timeout: 30000,
       retries: 3,
       logLevel: 'info',
-      ...config  // User values override defaults
+      ...config
     };
     
     logger.setLevel(this.config.logLevel);
@@ -37,16 +36,13 @@ export class ZeroGKit {
   }
 
   async init(): Promise<void> {
-    // Already ready? Do nothing
     if (this.initialized) return;
-    
-    // Already starting up? Wait for it
+
     if (this.initializing) {
       if (this.initPromise) return this.initPromise;
       throw new ConfigurationError('Initialization already in progress');
     }
 
-    // Start initialization
     this.initializing = true;
     this.initPromise = this._doInit();
     
@@ -67,48 +63,27 @@ export class ZeroGKit {
     try {
       logger.info('Connecting to 0G network...');
       
-      // 1. Create blockchain connection
       const provider = new ethers.JsonRpcProvider(this.config.rpcUrl);
       
-      // 2. Test the connection
       await withRetry(async () => {
         const network = await provider.getNetwork();
-        logger.debug('Connected to blockchain', { chainId: network.chainId });
+        logger.debug('Connected to blockchain', { chainId: network.chainId.toString() });
       }, this.config.retries);
 
-      // 3. Create wallet
       this.wallet = new ethers.Wallet(this.config.privateKey, provider);
       logger.debug('Wallet created', { address: this.wallet.address });
       
-      // 4. Create 0G broker (the main connection)
-      // this.broker = await withRetry(async () => {
-      //   return await createZGComputeNetworkBroker(this.wallet);
-      // }, this.config.retries);
-      
-      // Temporary mock broker for testing
-      this.broker = {
-        inference: {
-          listService: async () => ['mock-provider'],
-          acknowledgeProviderSigner: async () => {},
-          getServiceMetadata: async () => ({ endpoint: 'https://mock.com', model: 'deepseek-chat' }),
-          getRequestHeaders: async () => ({ 'Authorization': 'Bearer mock' })
-        },
-        ledger: {
-          getLedger: async () => ({ totalBalance: '1000000000000000000' }),
-          depositFund: async () => {},
-          refund: async () => {}
-        }
-      };
+      this.broker = await withRetry(async () => {
+        return await createZGComputeNetworkBroker(this.wallet);
+      }, this.config.retries);
 
-      // 5. Auto-deposit if requested
       if (this.config.autoDeposit) {
         try {
           logger.info('Auto-depositing 0.1 OG...');
           await this.broker.ledger.depositFund(0.1);
           logger.info('Auto-deposit successful');
         } catch (error) {
-          logger.warn('Auto-deposit failed, continuing...', error);
-          // Don't fail initialization if deposit fails
+          logger.warn('Auto-deposit failed, continuing...', error as Error);
         }
       }
 
@@ -119,12 +94,13 @@ export class ZeroGKit {
 
 
   async getBroker(): Promise<any> {
-    await this.init();  // Make sure we're initialized
+    await this.init();
     return this.broker;
   }
 
 
   async getBalance(): Promise<string> {
+    
     try {
       const broker = await this.getBroker();
       const account = await broker.ledger.getLedger();
@@ -170,7 +146,6 @@ export class ZeroGKit {
     } catch (error) {
       logger.error(`Withdrawal failed: ${amount} OG`, error as Error);
       
-      // Special handling for insufficient funds
       if ((error as any).message?.toLowerCase().includes('insufficient')) {
         throw new InsufficientFundsError(`Insufficient balance to withdraw ${amount} OG`);
       }
