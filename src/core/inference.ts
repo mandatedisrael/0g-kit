@@ -33,7 +33,7 @@ function getDefaultConfig(): ZeroGConfig {
   return {
     privateKey,
     rpcUrl: process.env.ZEROG_RPC_URL || 'https://evmrpc-testnet.0g.ai',
-    autoDeposit: process.env.ZEROG_AUTO_DEPOSIT === 'true',
+    autoDeposit: process.env.ZEROG_AUTO_DEPOSIT !== 'false',
     defaultModel: process.env.ZEROG_DEFAULT_MODEL || 'deepseek-chat',
     timeout: process.env.ZEROG_TIMEOUT ? parseInt(process.env.ZEROG_TIMEOUT) : 30000,
     retries: process.env.ZEROG_RETRIES ? parseInt(process.env.ZEROG_RETRIES) : 3,
@@ -41,21 +41,18 @@ function getDefaultConfig(): ZeroGConfig {
   };
 }
  
-export function initZeroG(config?: Partial<ZeroGConfig>): void {
-  if (globalClient) {
-    logger.warn('ZeroGKit already initialized, replacing with new config');
-  }
-  
+export async function initZeroG(config?: Partial<ZeroGConfig>): Promise<void> {
   const finalConfig = { ...getDefaultConfig(), ...config };
   
-  globalClient = new ZeroGKit(finalConfig);
+
+  globalClient = await ZeroGKit.getInstance(finalConfig);
   logger.info('ZeroGKit configured successfully');
 }
 
-function ensureInitialized(): void {
+async function ensureInitialized(): Promise<void> {
   if (!globalClient) {
     logger.info('Auto-initializing ZeroGKit with default configuration...');
-    initZeroG();
+    await initZeroG();
   }
 }
 
@@ -68,7 +65,7 @@ export async function chat(message: string, options: ChatOptions = {}): Promise<
   
   try {
     validateChatMessage(message);
-    ensureInitialized();
+    await ensureInitialized();
 
     logger.info('Chat request started', { 
       requestId, 
@@ -182,7 +179,7 @@ export async function chat(message: string, options: ChatOptions = {}): Promise<
 }
 
 async function findModelProvider(modelName: string): Promise<string> {
-  ensureInitialized();
+  await ensureInitialized();
   const broker = await globalClient!.getBroker();
   
   const services = await withRetry(async () => {
@@ -220,6 +217,7 @@ export async function useDeepseek(message: string, options: Omit<ChatOptions, 'm
   
   try {
     validateChatMessage(message);
+    await ensureInitialized();
     
     logger.info('DeepSeek request started', { 
       requestId, 
@@ -338,6 +336,7 @@ export async function useLlama(message: string, options: Omit<ChatOptions, 'mode
   
   try {
     validateChatMessage(message);
+    await ensureInitialized();
     
     logger.info('Llama request started', { 
       requestId, 
@@ -454,22 +453,22 @@ export async function useLlama(message: string, options: Omit<ChatOptions, 'mode
 }
 
 export async function deposit(amount: number): Promise<void> {
-  ensureInitialized();
+  await ensureInitialized();
   return await globalClient!.deposit(amount);
 }
 
 export async function withdraw(amount: number): Promise<void> {
-  ensureInitialized();
+  await ensureInitialized();
   return await globalClient!.withdraw(amount);
 }
 
 export async function getBalance(): Promise<string> {
-  ensureInitialized();
+  await ensureInitialized();
   return await globalClient!.getBalance();
 }
 
 export async function getAvailableModels(): Promise<Array<{model: string, provider: string}>> {
-  ensureInitialized();
+  await ensureInitialized();
   const broker = await globalClient!.getBroker();
   
   const services = await withRetry(async () => {
@@ -513,7 +512,7 @@ export async function listServices(): Promise<Array<{
   model: string;
   verifiability: string;
 }>> {
-  ensureInitialized();
+  await ensureInitialized();
   const broker = await globalClient!.getBroker();
   
   const services = await withRetry(async () => {

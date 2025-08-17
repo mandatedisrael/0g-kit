@@ -30,16 +30,10 @@ The 0G Kit abstracts away the following complex technical details:
 
 • **Timeout Management** - Automatic request timeout handling and cleanup
 
-## What You Get With 0G Kit
-
-**- Focus on Your App, Not Infrastructure Logic**
-With 0G Kit, you get a streamlined development experience that eliminates the need to understand complex blockchain interactions, provider management, and network protocols. Instead of spending time on infrastructure setup and maintenance, you can focus entirely on building your applications😉.
-
-**- Faster Integration, Easier Deployment**
-The complexities of 0G Compute Network are abstracted away, giving you a clean, familiar API that works like any other SDK. No need to worry about broker initialization, provider discovery, or fee settlement - it's all handled automatically behind the scenes.
-
 -------
-**TLDR; You get**
+
+## What You Get With 0G Kit
+**TLDR;**
 - ✅ **Simple 2-line setup** - instant and easy integration into any project!
 - ✅ **Automatic retries** - Built-in resilience for network issues
 - ✅ **Balance management** - Easy deposit/withdraw operations without worrying about the technicalities
@@ -50,13 +44,17 @@ The complexities of 0G Compute Network are abstracted away, giving you a clean, 
 - ✅ **Timeout protection** - Prevents hanging requests
 
 
-### Installation
+## Installation
 
 - Install 0G kit `npm install 0g-kit`
 
 - Get some 0G faucet from [Link](https://faucet.0g.ai/)
 
 - Add your EVM private key to .env 
+
+
+> ⚠️ **Important**: For first time usage, it automatically deposits 0.05 OG to activate your broker account. Subsequent calls won't auto-deposit unless you explicitly call the deposit function!
+
 
 ...and voila that's all, start building on 0G!
 

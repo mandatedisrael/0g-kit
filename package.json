@@ -10,7 +10,6 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "dependencies": {
     "@0glabs/0g-serving-broker": "^0.3.1",
@@ -25,5 +24,10 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     }
+  },
+  "author": {
+    "name": "notMartin",
+    "email": "mandatedisrael@gmail.com",
+    "url": "https://x.com/Damiclone"
   }
 }
