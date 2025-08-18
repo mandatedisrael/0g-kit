@@ -1,6 +1,6 @@
 {
   "name": "0g-kit",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A simple 2 liner for integrating any 0G infrastructure",
   "type": "module",
   "types": "dist/index.d.ts",
