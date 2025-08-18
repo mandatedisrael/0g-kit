@@ -43,36 +43,49 @@ export class ZeroGKit {
   }
 
   private static getStateFile(): string {
-    const homeDir = process.env.HOME || process.env.USERPROFILE;
-    const zerogDir = path.join(homeDir!, '.zerog');
+    const homeDir = process.env.HOME || process.env.USERPROFILE || '/tmp';
+    const zerogDir = path.join(homeDir, '.zerog');
 
-
-    if (!fs.existsSync(zerogDir)) {
-      fs.mkdirSync(zerogDir, { recursive: true });
+    // create dir if we in a writable environment
+    if (homeDir !== '/tmp' && !fs.existsSync(zerogDir)) {
+      try {
+        fs.mkdirSync(zerogDir, { recursive: true });
+      } catch (error) {
+        // Fallback to /tmp if we can't create the directory
+        const tmpZerogDir = path.join('/tmp', '.zerog');
+        if (!fs.existsSync(tmpZerogDir)) {
+          fs.mkdirSync(tmpZerogDir, { recursive: true });
+        }
+        return path.join(tmpZerogDir, 'state.json');
+      }
     }
     
     return path.join(zerogDir, 'state.json');
   }
 
   private static loadState(): Record<string, any> {
-    const file = this.getStateFile();
-    if (fs.existsSync(file)) {
-      try {
-        return JSON.parse(fs.readFileSync(file, 'utf8'));
-      } catch (error) {
-        logger.warn('Failed to load state file, starting fresh', error as Error);
-        return {};
+    try {
+      const file = this.getStateFile();
+      if (fs.existsSync(file)) {
+        try {
+          return JSON.parse(fs.readFileSync(file, 'utf8'));
+        } catch (error) {
+          logger.warn('Failed to load state file, starting fresh', error as Error);
+          return {};
+        }
       }
+    } catch (error) {
+      logger.warn('Failed to access state file, using in-memory state', error as Error);
     }
     return {};
   }
 
   private static saveState(state: Record<string, any>): void {
-    const file = this.getStateFile();
     try {
+      const file = this.getStateFile();
       fs.writeFileSync(file, JSON.stringify(state, null, 2));
     } catch (error) {
-      logger.error('Failed to save state file', error as Error);
+      logger.warn('Failed to save state file, continuing without persistence', error as Error);
     }
   }
 
@@ -103,8 +116,8 @@ export class ZeroGKit {
     this.config = {
       rpcUrl: "https://evmrpc-testnet.0g.ai",
       autoDeposit: true,
-      defaultModel: "deepseek-chat",
-      timeout: 30000,
+      defaultModel: "llama-3.3-70b-instruct",
+      timeout: 3000000,
       retries: 3,
       logLevel: 'info',
       ...config
@@ -115,6 +128,11 @@ export class ZeroGKit {
       rpcUrl: this.config.rpcUrl,
       autoDeposit: this.config.autoDeposit 
     });
+  }
+
+
+  public getConfig(): Readonly<Required<ZeroGConfig>> {
+    return this.config;
   }
 
   async init(): Promise<void> {

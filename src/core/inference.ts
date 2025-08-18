@@ -30,15 +30,22 @@ function getDefaultConfig(): ZeroGConfig {
     );
   }
 
-  return {
+  const base: ZeroGConfig = {
     privateKey,
     rpcUrl: process.env.ZEROG_RPC_URL || 'https://evmrpc-testnet.0g.ai',
     autoDeposit: process.env.ZEROG_AUTO_DEPOSIT !== 'false',
     defaultModel: process.env.ZEROG_DEFAULT_MODEL || 'deepseek-chat',
-    timeout: process.env.ZEROG_TIMEOUT ? parseInt(process.env.ZEROG_TIMEOUT) : 30000,
-    retries: process.env.ZEROG_RETRIES ? parseInt(process.env.ZEROG_RETRIES) : 3,
     logLevel: (process.env.ZEROG_LOG_LEVEL as any) || 'info'
   };
+
+  if (process.env.ZEROG_TIMEOUT) {
+    base.timeout = parseInt(process.env.ZEROG_TIMEOUT);
+  }
+  if (process.env.ZEROG_RETRIES) {
+    base.retries = parseInt(process.env.ZEROG_RETRIES);
+  }
+
+  return base;
 }
  
 export async function initZeroG(config?: Partial<ZeroGConfig>): Promise<void> {
@@ -59,9 +66,11 @@ async function ensureInitialized(): Promise<void> {
 export async function chat(message: string, options: ChatOptions = {}): Promise<string> {
   const startTime = Date.now();
   const requestId = uuidv4();
-  
-  const timeout = options.timeout || 30000;
-  const retries = options.retries || 3;
+
+  const sdkTimeout = (globalClient?.getConfig().timeout) ?? 30000;
+  const sdkRetries = (globalClient?.getConfig().retries) ?? 3;
+  const timeout = options.timeout ?? sdkTimeout;
+  const retries = options.retries ?? sdkRetries;
   
   try {
     validateChatMessage(message);
@@ -192,7 +201,7 @@ async function findModelProvider(modelName: string): Promise<string> {
     
     logger.debug(`Found ${serviceList.length} available services`);
     return serviceList;
-  }, 3);
+  }, (globalClient?.getConfig().retries) ?? 3);
 
   for (const service of services) {
     const providerAddress = Array.isArray(service) ? service[0] : service;
@@ -243,7 +252,8 @@ export async function useDeepseek(message: string, options: Omit<ChatOptions, 'm
       return await broker.inference.getRequestHeaders(providerAddress, message);
     }, options.retries || 3);
 
-    const timeout = options.timeout || 30000;
+    const sdkTimeout = (globalClient?.getConfig().timeout) ?? 30000;
+    const timeout = options.timeout ?? sdkTimeout;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       logger.warn('DeepSeek request timeout, aborting...', { requestId, timeout });
@@ -364,7 +374,8 @@ export async function useLlama(message: string, options: Omit<ChatOptions, 'mode
       return await broker.inference.getRequestHeaders(providerAddress, message);
     }, options.retries || 3);
 
-    const timeout = options.timeout || 30000;
+    const sdkTimeout = (globalClient?.getConfig().timeout) ?? 30000;
+    const timeout = options.timeout ?? sdkTimeout;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
       logger.warn('Llama request timeout, aborting...', { requestId, timeout });

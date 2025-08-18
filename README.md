@@ -50,7 +50,7 @@ The 0G Kit abstracts away the following complex technical details:
 
 - Get some 0G faucet from [Link](https://faucet.0g.ai/)
 
-- Add your EVM private key to .env 
+- Add your EVM private key to .env ( PRIVATE_KEY )
 
 
 > ⚠️ **Important**: For first time usage, it automatically deposits 0.05 OG to activate your broker account. Subsequent calls won't auto-deposit unless you explicitly call the deposit function!
@@ -139,7 +139,7 @@ initZeroG({
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `privateKey` | string | **required** | Your Ethereum private key (0x-prefixed) |
+| `privateKey` | string | **required** | Your EVM private key (0x-prefixed) |
 | `rpcUrl` | string | `https://evmrpc-testnet.0g.ai` | 0G network RPC endpoint |
 | `autoDeposit` | boolean | `true` | Automatically deposit 0.1 OG on initialization |
 | `defaultModel` | string | `deepseek-chat` | Default AI model to use |
