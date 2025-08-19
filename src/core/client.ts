@@ -43,20 +43,12 @@ export class ZeroGKit {
   }
 
   private static getStateFile(): string {
-    const homeDir = process.env.HOME || process.env.USERPROFILE || '/tmp';
-    const zerogDir = path.join(homeDir, '.zerog');
+    const zerogDir = path.join('/tmp', '.zerog');
 
-    // create dir if we in a writable environment
-    if (homeDir !== '/tmp' && !fs.existsSync(zerogDir)) {
+    if (!fs.existsSync(zerogDir)) {
       try {
         fs.mkdirSync(zerogDir, { recursive: true });
       } catch (error) {
-        // Fallback to /tmp if we can't create the directory
-        const tmpZerogDir = path.join('/tmp', '.zerog');
-        if (!fs.existsSync(tmpZerogDir)) {
-          fs.mkdirSync(tmpZerogDir, { recursive: true });
-        }
-        return path.join(tmpZerogDir, 'state.json');
       }
     }
     
