@@ -22,6 +22,10 @@ export {
   upload,
   download,
   initZeroGStorage,
+  uploadKeyValueFile,
+  downloadKeyValueFile,
+  uploadStream,
+  downloadStream,
 } from './core/storage-functions.js';
 
 export { ZeroGStorage } from './core/storage.js';

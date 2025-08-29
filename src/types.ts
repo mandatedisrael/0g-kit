@@ -51,3 +51,37 @@ export interface FileInfo {
     uploadTime: number;
     txHash: string;
   }
+
+export interface KeyValueOptions {
+    timeout?: number;
+    retries?: number;
+    gasPrice?: string; // Custom gas price for KV operations (in wei as string)
+  }
+
+export interface KeyValueResponse {
+    streamId: string;
+    key: string;
+    txHash: string;
+    timestamp: number;
+  }
+
+export interface KeyValueData {
+    streamId: string;
+    key: string;
+    value: string;
+  }
+
+export interface StreamOptions {
+    timeout?: number;
+    retries?: number;
+    gasPrice?: string; // Custom gas price for stream operations (in wei as string)
+    filename?: string; // Optional filename for stream uploads
+  }
+
+export interface StreamResponse {
+    rootHash: string;
+    txHash: string;
+    fileSize: number;
+    timestamp: number;
+    filename?: string;
+  }

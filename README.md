@@ -57,6 +57,7 @@ The 0G Kit abstracts away the following complex technical details:
 - ✅ **Balance management** - Easy deposit/withdraw operations without worrying about the technicalities
 - ✅ **Multiple AI models** - Support for All providers on 0G inference!
 - ✅ **Decentralized storage** - Simple file upload/download with just 2-3 lines of code!
+- ✅ **Key-Value storage** - Easy KV operations with 2-line setup!
 - ✅ **Custom gas control** - Fine-tuned gas price management for uploads
 - ✅ **TypeScript support** - Full type definitions included
 - ✅ **Error handling** - Clear, actionable error messages
@@ -75,11 +76,13 @@ The 0G Kit abstracts away the following complex technical details:
 ## Import Options
 
 ```javascript
-// Full SDK (compute + storage)
-import { chat, uploadFile, downloadFile } from '0g-kit';
+// Full SDK (compute + storage + KV + streams)
+import { chat, uploadFile, downloadFile, uploadKeyValueFile, downloadKeyValueFile, uploadStream, downloadStream } from '0g-kit';
 
 // Storage-only imports
-import { uploadFile, downloadFile, uploadFileWithGas } from '0g-kit/storage';
+import { uploadFile, downloadFile, uploadFileWithGas, uploadKeyValueFile, downloadKeyValueFile, uploadStream, downloadStream } from '0g-kit/storage';
+```
+```
 
 // Compute-only imports  
 import { chat, useDeepseek, useLlama } from '0g-kit';
@@ -105,8 +108,18 @@ const response = await chat('Hello, how are you?');
 import { uploadFile } from '0g-kit';
 const result = await uploadFile('./my-file.txt');
 
+// Key-Value Storage
+import { uploadKeyValueFile, downloadKeyValueFile } from '0g-kit';
+const kvResult = await uploadKeyValueFile('my-stream', 'key', 'value');
+const retrieved = await downloadKeyValueFile('my-stream', 'key');
+
+// Stream Storage
+import { uploadStream, downloadStream } from '0g-kit';
+const streamResult = await uploadStream(myReadableStream);
+const downloadStream = await downloadStream(result.rootHash);
+
 // Storage-only import
-import { uploadFile } from '0g-kit/storage';
+import { uploadFile, uploadKeyValueFile, uploadStream } from '0g-kit/storage';
 const result = await uploadFile('./my-file.txt');
 ```
 
@@ -203,6 +216,60 @@ const info = await getFileInfo(result.rootHash);
 console.log('File size:', info.fileSize);
 ```
 
+### Key-Value Storage Operations
+
+```javascript
+// Upload key-value data (2 lines!)
+import { uploadKeyValueFile } from '0g-kit';
+const result = await uploadKeyValueFile('my-stream', 'user-settings', JSON.stringify({theme: 'dark'}));
+console.log('Transaction Hash:', result.txHash);
+```
+
+```javascript
+// Download key-value data (2 lines!)
+import { downloadKeyValueFile } from '0g-kit';
+const value = await downloadKeyValueFile('my-stream', 'user-settings');
+const settings = JSON.parse(value);
+console.log('User theme:', settings.theme);
+```
+
+
+
+```javascript
+// KV operations with custom options
+import { uploadKeyValueFile } from '0g-kit';
+const result = await uploadKeyValueFile('my-stream', 'config', 'value', {
+  timeout: 60000,  // 1 minute
+  retries: 3
+});
+```
+
+### Stream Operations
+
+```javascript
+// Upload a stream (2 lines!)
+import { uploadStream } from '0g-kit';
+const result = await uploadStream(myReadableStream, { filename: 'data.txt' });
+console.log('Transaction Hash:', result.txHash);
+```
+
+```javascript
+// Download as stream (2 lines!)
+import { downloadStream } from '0g-kit';
+const stream = await downloadStream(result.rootHash);
+stream.pipe(fs.createWriteStream('output.txt'));
+```
+
+```javascript
+// Stream operations with custom options
+import { uploadStream } from '0g-kit';
+const result = await uploadStream(myReadableStream, {
+  filename: 'large-file.bin',
+  timeout: 300000,  // 5 minutes
+  retries: 5
+});
+```
+
 ### Advance User customization
 ```javascript
 import { initZeroG, chat  } from '0g-kit';
@@ -275,6 +342,23 @@ try {
 | `timeout` | number | `300000` | Upload/download timeout in milliseconds |
 | `retries` | number | `3` | Number of retry attempts |
 | `gasPrice` | string | - | Custom gas price for upload transactions (in wei as string) |
+
+## 🔑 Key-Value Storage Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `timeout` | number | `300000` | KV operation timeout in milliseconds |
+| `retries` | number | `3` | Number of retry attempts |
+| `gasPrice` | string | - | Custom gas price for KV transactions (in wei as string) |
+
+## 🌊 Stream Storage Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `timeout` | number | `300000` | Stream operation timeout in milliseconds |
+| `retries` | number | `3` | Number of retry attempts |
+| `gasPrice` | string | - | Custom gas price for stream transactions (in wei as string) |
+| `filename` | string | `stream-data` | Optional filename for stream uploads |
 
 ### Gas Price Examples
 
