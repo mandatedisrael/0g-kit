@@ -30,7 +30,7 @@ export interface ChatResponse {
 export interface StorageOptions {
     timeout?: number;
     retries?: number;
-    gasPrice?: string;
+    gasPrice?: string; // Custom gas price for upload transactions (in wei as string)
   }
 
 export interface UploadResponse {

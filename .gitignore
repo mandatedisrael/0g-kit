@@ -106,3 +106,4 @@ temp/
 
 # TypeScript cache
 *.tsbuildinfo
+storage-example.js

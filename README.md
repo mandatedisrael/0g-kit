@@ -243,7 +243,7 @@ try {
 |--------|------|---------|-------------|
 | `timeout` | number | `300000` | Upload/download timeout in milliseconds |
 | `retries` | number | `3` | Number of retry attempts |
-| `gasPrice` | string | `5000160` | Custom gas price for upload transactions (5x default 1000032) |
+| `gasPrice` | string | - | Custom gas price for upload transactions (in wei as string) |
 
 
 ## 🛠️ Development

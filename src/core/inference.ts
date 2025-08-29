@@ -9,6 +9,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+
+
 let globalClient: ZeroGKit | null = null;
 
 function loadEnvVars(): void {
