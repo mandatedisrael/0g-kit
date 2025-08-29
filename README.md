@@ -57,6 +57,7 @@ The 0G Kit abstracts away the following complex technical details:
 - ✅ **Balance management** - Easy deposit/withdraw operations without worrying about the technicalities
 - ✅ **Multiple AI models** - Support for All providers on 0G inference!
 - ✅ **Decentralized storage** - Simple file upload/download with just 2-3 lines of code!
+- ✅ **Custom gas control** - Fine-tuned gas price management for uploads
 - ✅ **TypeScript support** - Full type definitions included
 - ✅ **Error handling** - Clear, actionable error messages
 - ✅ **Logging** - Configurable logging for debugging
@@ -70,6 +71,19 @@ The 0G Kit abstracts away the following complex technical details:
 - Get some 0G faucet from [Link](https://faucet.0g.ai/)
 
 - Add your EVM private key to .env ( PRIVATE_KEY )
+
+## Import Options
+
+```javascript
+// Full SDK (compute + storage)
+import { chat, uploadFile, downloadFile } from '0g-kit';
+
+// Storage-only imports
+import { uploadFile, downloadFile, uploadFileWithGas } from '0g-kit/storage';
+
+// Compute-only imports  
+import { chat, useDeepseek, useLlama } from '0g-kit';
+```
 
 
 > ⚠️ **Important**: For first time usage, it automatically deposits 0.05 OG to activate your broker account. Subsequent calls won't auto-deposit unless you explicitly call the deposit function!
@@ -89,6 +103,10 @@ const response = await chat('Hello, how are you?');
 
 // File Upload
 import { uploadFile } from '0g-kit';
+const result = await uploadFile('./my-file.txt');
+
+// Storage-only import
+import { uploadFile } from '0g-kit/storage';
 const result = await uploadFile('./my-file.txt');
 ```
 
@@ -151,12 +169,25 @@ console.log('Root Hash:', result.rootHash);
 ```
 
 ```javascript
-// Upload a file with custom options
+// Upload with custom gas price
+import { uploadFileWithGas } from '0g-kit';
+const result = await uploadFileWithGas('./my-file.txt', '10000000'); // 10 gwei
+console.log('Root Hash:', result.rootHash);
+```
+
+```javascript
+// Upload with custom options
 import { uploadFile } from '0g-kit';
 const result = await uploadFile('./my-file.txt', {
   timeout: 120000,  // 2 minutes
   retries: 5
 });
+```
+
+```javascript
+// Storage-specific imports (alternative)
+import { uploadFile, downloadFile } from '0g-kit/storage';
+const result = await uploadFile('./my-file.txt');
 ```
 
 ```javascript
@@ -244,6 +275,21 @@ try {
 | `timeout` | number | `300000` | Upload/download timeout in milliseconds |
 | `retries` | number | `3` | Number of retry attempts |
 | `gasPrice` | string | - | Custom gas price for upload transactions (in wei as string) |
+
+### Gas Price Examples
+
+```javascript
+// Default gas price (automatic)
+const result = await uploadFile('./file.txt');
+
+// Custom gas price via options
+const result = await uploadFile('./file.txt', {
+  gasPrice: '10000000' // 10 gwei
+});
+
+// Direct gas price control
+const result = await uploadFileWithGas('./file.txt', '10000000'); // 10 gwei
+```
 
 
 ## 🛠️ Development

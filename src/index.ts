@@ -16,6 +16,7 @@ export {
 // Storage exports
 export {
   uploadFile,
+  uploadFileWithGas,
   downloadFile,
   getFileInfo,
   upload,
