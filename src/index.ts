@@ -13,6 +13,18 @@ export {
 
 } from './core/inference.js';
 
+// Storage exports
+export {
+  uploadFile,
+  downloadFile,
+  getFileInfo,
+  upload,
+  download,
+  initZeroGStorage,
+} from './core/storage-functions.js';
+
+export { ZeroGStorage } from './core/storage.js';
+
 export * from './types.js';
 
 export {

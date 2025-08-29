@@ -107,6 +107,7 @@ export class ZeroGKit {
     
     this.config = {
       rpcUrl: "https://evmrpc-testnet.0g.ai",
+      indexerRpcUrl: "https://indexer-storage-testnet-turbo.0g.ai",
       autoDeposit: true,
       defaultModel: "llama-3.3-70b-instruct",
       timeout: 3000000,
@@ -166,7 +167,7 @@ export class ZeroGKit {
       logger.debug('Wallet created', { address: this.wallet.address });
       
       this.broker = await withRetry(async () => {
-        return await createZGComputeNetworkBroker(this.wallet);
+        return await createZGComputeNetworkBroker(this.wallet as any);
       }, this.config.retries);
 
       if (this.config.autoDeposit && !this.autoDepositCompleted) {

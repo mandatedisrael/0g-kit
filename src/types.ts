@@ -1,4 +1,3 @@
-// what users can customize
 export interface ZeroGConfig {
     privateKey: string;                   
     rpcUrl?: string;                      
@@ -7,10 +6,10 @@ export interface ZeroGConfig {
     timeout?: number;                    
     retries?: number;                    
     logLevel?: 'debug' | 'info' | 'warn' | 'error' | 'silent';
+    indexerRpcUrl?: string;
   }
   
-  // customize ai calls by users 
-  export interface ChatOptions {
+export interface ChatOptions {
     model?: string;          
     provider?: string;       
     temperature?: number;    
@@ -19,11 +18,36 @@ export interface ZeroGConfig {
     retries?: number;        
   }
   
-  export interface ChatResponse {
+export interface ChatResponse {
     content: string;         
     model: string;          
     provider: string;       
     tokensUsed?: number;    
     requestId: string;      
     timestamp: number;      
+  }
+
+export interface StorageOptions {
+    timeout?: number;
+    retries?: number;
+    gasPrice?: string;
+  }
+
+export interface UploadResponse {
+    rootHash: string;
+    txHash: string;
+    fileSize: number;
+    timestamp: number;
+  }
+
+export interface DownloadOptions {
+    timeout?: number;
+    retries?: number;
+  }
+
+export interface FileInfo {
+    rootHash: string;
+    fileSize: number;
+    uploadTime: number;
+    txHash: string;
   }

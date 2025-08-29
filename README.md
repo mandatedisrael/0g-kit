@@ -6,6 +6,7 @@ A developer-friendly SDK that makes it easy to interact with the 0G decentralize
 
 The 0G Kit abstracts away the following complex technical details:
 
+### 🧠 **0G Compute Network**
 • **Broker Initialization** - No need to manually create and configure the 0G Compute Network broker with ethers.js providers, wallets etc
 
 • **Provider Discovery** - Automatic service discovery and provider selection instead of manually calling `broker.inference.listService()`
@@ -30,6 +31,23 @@ The 0G Kit abstracts away the following complex technical details:
 
 • **Timeout Management** - Automatic request timeout handling and cleanup
 
+### 💾 **0G Storage Network**
+• **Indexer Initialization** - No need to manually create and configure the 0G Storage indexer with ethers.js providers, wallets etc
+
+• **File Processing** - Automatic file handling, Merkle tree generation, and buffer management
+
+• **Upload Management** - Handles all upload operations, transaction signing, and blockchain interactions
+
+• **Download Management** - Automatic file retrieval and verification using root hashes
+
+• **Gas Management** - Automatic gas price optimization (5x default) and transaction fee handling
+
+• **Error Handling** - Comprehensive error handling for network issues, file operations, and blockchain failures
+
+• **Retry Logic** - Built-in retry mechanisms for failed uploads/downloads
+
+• **Timeout Management** - Automatic operation timeout handling and cleanup
+
 -------
 
 ## What You Get With 0G Kit
@@ -38,6 +56,7 @@ The 0G Kit abstracts away the following complex technical details:
 - ✅ **Automatic retries** - Built-in resilience for network issues
 - ✅ **Balance management** - Easy deposit/withdraw operations without worrying about the technicalities
 - ✅ **Multiple AI models** - Support for All providers on 0G inference!
+- ✅ **Decentralized storage** - Simple file upload/download with just 2-3 lines of code!
 - ✅ **TypeScript support** - Full type definitions included
 - ✅ **Error handling** - Clear, actionable error messages
 - ✅ **Logging** - Configurable logging for debugging
@@ -64,8 +83,13 @@ The 0G Kit abstracts away the following complex technical details:
 ### Basic Usage (2 lines!)
 
 ```javascript
+// AI Chat
 import { chat } from '0g-kit';
 const response = await chat('Hello, how are you?');
+
+// File Upload
+import { uploadFile } from '0g-kit';
+const result = await uploadFile('./my-file.txt');
 ```
 
 ### Model-Specific Functions
@@ -117,6 +141,37 @@ import { withdraw } from '0g-kit';
 await withdraw(0.2); 
 ```
 
+### Storage Operations
+
+```javascript
+// Upload a file (2 lines!)
+import { uploadFile } from '0g-kit';
+const result = await uploadFile('./my-file.txt');
+console.log('Root Hash:', result.rootHash);
+```
+
+```javascript
+// Upload a file with custom options
+import { uploadFile } from '0g-kit';
+const result = await uploadFile('./my-file.txt', {
+  timeout: 120000,  // 2 minutes
+  retries: 5
+});
+```
+
+```javascript
+// Download a file (2 lines!)
+import { downloadFile } from '0g-kit';
+await downloadFile(result.rootHash, './downloaded-file.txt');
+```
+
+```javascript
+// Get file information
+import { getFileInfo } from '0g-kit';
+const info = await getFileInfo(result.rootHash);
+console.log('File size:', info.fileSize);
+```
+
 ### Advance User customization
 ```javascript
 import { initZeroG, chat  } from '0g-kit';
@@ -141,6 +196,7 @@ initZeroG({
 |--------|------|---------|-------------|
 | `privateKey` | string | **required** | Your EVM private key (0x-prefixed) |
 | `rpcUrl` | string | `https://evmrpc-testnet.0g.ai` | 0G network RPC endpoint |
+| `indexerRpcUrl` | string | `https://indexer-storage-testnet-turbo.0g.ai` | 0G storage indexer RPC endpoint |
 | `autoDeposit` | boolean | `true` | Automatically deposit 0.1 OG on initialization |
 | `defaultModel` | string | `deepseek-chat` | Default AI model to use |
 | `timeout` | number | `30000` | Request timeout in milliseconds |
@@ -181,6 +237,14 @@ try {
 | `timeout` | number | `30000` | Request timeout |
 | `retries` | number | `3` | Retry attempts |
 
+## 📁 Storage Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `timeout` | number | `300000` | Upload/download timeout in milliseconds |
+| `retries` | number | `3` | Number of retry attempts |
+| `gasPrice` | string | `5000160` | Custom gas price for upload transactions (5x default 1000032) |
+
 
 ## 🛠️ Development
 
@@ -200,8 +264,8 @@ npm run dev
 
 ## 🚀 Future Releases
 
-- 🔄 **0G Storage Support** - Decentralized storage integration coming soon
 - 🔄 **0G Data Availability** - Data availability layer support in development
+- 🔄 **Advanced Storage Features** - Batch uploads, streaming, and more storage capabilities
 
 ## 🤝 Contributing
 
