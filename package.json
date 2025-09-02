@@ -12,7 +12,6 @@
   "keywords": [],
   "license": "ISC",
   "dependencies": {
-    "0g-kit": "file:.yalc/0g-kit",
     "@0glabs/0g-serving-broker": "^0.3.1",
     "@0glabs/0g-ts-sdk": "^0.3.1",
     "ethers": "^6.15.0"
@@ -22,14 +21,8 @@
     "README.md"
   ],
   "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./storage": {
-      "import": "./dist/core/storage-functions.js",
-      "types": "./dist/core/storage-functions.d.ts"
-    }
+    ".": "./dist/index.js",
+    "./storage": "./dist/core/storage-functions.js"
   },
   "author": {
     "name": "notMartin",

@@ -58,72 +58,45 @@ The 0G Kit abstracts away the following complex technical details:
 - ✅ **Multiple AI models** - Support for All providers on 0G inference!
 - ✅ **Decentralized storage** - Simple file upload/download with just 2-3 lines of code!
 - ✅ **Key-Value storage** - Easy KV operations with 2-line setup!
+- ✅ **Stream storage** - Efficient streaming for large files!
 - ✅ **Custom gas control** - Fine-tuned gas price management for uploads
 - ✅ **TypeScript support** - Full type definitions included
 - ✅ **Error handling** - Clear, actionable error messages
 - ✅ **Logging** - Configurable logging for debugging
 - ✅ **Timeout protection** - Prevents hanging requests
 
-
 ## Installation
 
 - Install 0G kit `npm install 0g-kit`
-
 - Get some 0G faucet from [Link](https://faucet.0g.ai/)
-
 - Add your EVM private key to .env ( PRIVATE_KEY )
+
+> ⚠️ **Important**: For first time usage, it automatically deposits 0.05 OG to activate your broker account. Subsequent calls won't auto-deposit unless you explicitly call the deposit function!
 
 ## Import Options
 
 ```javascript
-// Full SDK (compute + storage + KV + streams)
-import { chat, uploadFile, downloadFile, uploadKeyValueFile, downloadKeyValueFile, uploadStream, downloadStream } from '0g-kit';
+
+// Compute-only imports  
+import { chat, useDeepseek, useLlama } from '0g-kit';
 
 // Storage-only imports
 import { uploadFile, downloadFile, uploadFileWithGas, uploadKeyValueFile, downloadKeyValueFile, uploadStream, downloadStream } from '0g-kit/storage';
 ```
-```
 
-// Compute-only imports  
-import { chat, useDeepseek, useLlama } from '0g-kit';
-```
+---
 
+# 🧠 0G Compute Network
 
-> ⚠️ **Important**: For first time usage, it automatically deposits 0.05 OG to activate your broker account. Subsequent calls won't auto-deposit unless you explicitly call the deposit function!
-
-
-...and voila that's all, start building on 0G!
-
-
-
-
-### Basic Usage (2 lines!)
+## Basic Usage (2 lines!)
 
 ```javascript
 // AI Chat
 import { chat } from '0g-kit';
 const response = await chat('Hello, how are you?');
-
-// File Upload
-import { uploadFile } from '0g-kit';
-const result = await uploadFile('./my-file.txt');
-
-// Key-Value Storage
-import { uploadKeyValueFile, downloadKeyValueFile } from '0g-kit';
-const kvResult = await uploadKeyValueFile('my-stream', 'key', 'value');
-const retrieved = await downloadKeyValueFile('my-stream', 'key');
-
-// Stream Storage
-import { uploadStream, downloadStream } from '0g-kit';
-const streamResult = await uploadStream(myReadableStream);
-const downloadStream = await downloadStream(result.rootHash);
-
-// Storage-only import
-import { uploadFile, uploadKeyValueFile, uploadStream } from '0g-kit/storage';
-const result = await uploadFile('./my-file.txt');
 ```
 
-### Model-Specific Functions
+## Model-Specific Functions
 
 ```javascript
 // Use DeepSeek model specifically
@@ -137,31 +110,30 @@ import { useLlama } from '0g-kit';
 const response = await useLlama('Hello, how are you?')
 ```
 
-### Service Discovery
+## Service Discovery
 
 ```javascript
 // Get list of available models and providers
 import { getAvailableModels } from '0g-kit';
-const models = await getAvailableModels();
+await getAvailableModels().then(console.log());
 ```
 
 ```javascript
 // Get detailed service information
 import { listServices } from '0g-kit';
-const services = await listServices();
-console.log('Service details:', services);
+await listServices().then(console.log());
 ```
 
-### Manage Your Balance
+## Manage Your Balance
 
 ```javascript
-// check balance
+// Check balance
 import { getBalance } from '0g-kit';
-await getBalance().then(console.log(`Balance: ${balance} OG`));
+await getBalance().then(console.log());
 ```
 
 ```javascript
-// Deposit 0.5 0G 4rm wallet to broker account
+// Deposit 0.5 0G from wallet to broker account
 import { deposit } from '0g-kit';
 await deposit(0.5); 
 ```
@@ -172,13 +144,53 @@ import { withdraw } from '0g-kit';
 await withdraw(0.2); 
 ```
 
-### Storage Operations
+## Advanced Configuration
+
+```javascript
+import { initZeroG } from '0g-kit';
+
+// Advanced setup with custom options
+initZeroG({
+  privateKey: '0x1234567890abcdef...',
+  rpcUrl: 'https://evmrpc-testnet.0g.ai',
+  autoDeposit: true,
+  defaultModel: 'deepseek-chat', 
+  timeout: 30000,
+  retries: 3,
+  logLevel: 'info' 
+});
+```
+
+## Chat Options 
+
+### will be implemented once 0G activates the feature on each models ⚠️
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `model` | string | `auto` | AI model to use |
+| `provider` | string | `auto` | Specific AI provider address |
+| `temperature` | number | `0.7` | Response creativity (0.0-1.0) |
+| `maxTokens` | number | `1000` | Maximum response length |
+| `timeout` | number | `30000` | Request timeout |
+| `retries` | number | `3` | Retry attempts |
+
+---
+
+# �� 0G Storage Network
+
+## File Storage Operations
 
 ```javascript
 // Upload a file (2 lines!)
 import { uploadFile } from '0g-kit';
 const result = await uploadFile('./my-file.txt');
 console.log('Root Hash:', result.rootHash);
+```
+
+```javascript
+// Download a file (2 lines!)
+import { downloadFile } from '0g-kit';
+await downloadFile(result.rootHash, './downloaded-file.txt');
 ```
 
 ```javascript
@@ -198,25 +210,13 @@ const result = await uploadFile('./my-file.txt', {
 ```
 
 ```javascript
-// Storage-specific imports (alternative)
-import { uploadFile, downloadFile } from '0g-kit/storage';
-const result = await uploadFile('./my-file.txt');
-```
-
-```javascript
-// Download a file (2 lines!)
-import { downloadFile } from '0g-kit';
-await downloadFile(result.rootHash, './downloaded-file.txt');
-```
-
-```javascript
 // Get file information
 import { getFileInfo } from '0g-kit';
 const info = await getFileInfo(result.rootHash);
 console.log('File size:', info.fileSize);
 ```
 
-### Key-Value Storage Operations
+## Key-Value Storage Operations
 
 ```javascript
 // Upload key-value data (2 lines!)
@@ -233,8 +233,6 @@ const settings = JSON.parse(value);
 console.log('User theme:', settings.theme);
 ```
 
-
-
 ```javascript
 // KV operations with custom options
 import { uploadKeyValueFile } from '0g-kit';
@@ -244,7 +242,7 @@ const result = await uploadKeyValueFile('my-stream', 'config', 'value', {
 });
 ```
 
-### Stream Operations
+## Stream Operations
 
 ```javascript
 // Upload a stream (2 lines!)
@@ -270,72 +268,9 @@ const result = await uploadStream(myReadableStream, {
 });
 ```
 
-### Advance User customization
-```javascript
-import { initZeroG, chat  } from '0g-kit';
+## Storage Options
 
-// Advanced setup with custom options
-initZeroG({
-  privateKey: '0x1234567890abcdef...',
-  rpcUrl: 'https://evmrpc-testnet.0g.ai',
-  autoDeposit: true,
-  defaultModel: 'deepseek-chat', 
-  timeout: 30000,
-  retries: 3,
-  logLevel: 'info' 
-});
-
-```
-
-
-## ⚙️ Configuration Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `privateKey` | string | **required** | Your EVM private key (0x-prefixed) |
-| `rpcUrl` | string | `https://evmrpc-testnet.0g.ai` | 0G network RPC endpoint |
-| `indexerRpcUrl` | string | `https://indexer-storage-testnet-turbo.0g.ai` | 0G storage indexer RPC endpoint |
-| `autoDeposit` | boolean | `true` | Automatically deposit 0.1 OG on initialization |
-| `defaultModel` | string | `deepseek-chat` | Default AI model to use |
-| `timeout` | number | `30000` | Request timeout in milliseconds |
-| `retries` | number | `3` | Number of retry attempts |
-| `logLevel` | string | `info` | Logging level (`debug`, `info`, `warn`, `error`, `silent`) |
-
-
-## 🔧 Error Handling
-
-The SDK provides clear error types:
-
-```javascript
-import { ConfigurationError, NetworkError, InsufficientFundsError } from '0g-kit';
-
-try {
-  const response = await chat('Hello');
-} catch (error) {
-  if (error instanceof ConfigurationError) {
-    console.log('Configuration issue:', error.message);
-  } else if (error instanceof InsufficientFundsError) {
-    console.log('Need more funds:', error.message);
-  } else if (error instanceof NetworkError) {
-    console.log('Network issue:', error.message);
-  }
-}
-```
-
-## 🎯 Chat Options 
-
-### will be implemented once 0G activates the feature on each models ⚠️
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `model` | string | `auto` | AI model to use |
-| `provider` | string | `auto` | Specific AI provider address |
-| `temperature` | number | `0.7` | Response creativity (0.0-1.0) |
-| `maxTokens` | number | `1000` | Maximum response length |
-| `timeout` | number | `30000` | Request timeout |
-| `retries` | number | `3` | Retry attempts |
-
-## 📁 Storage Options
+### File Storage Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -343,7 +278,7 @@ try {
 | `retries` | number | `3` | Number of retry attempts |
 | `gasPrice` | string | - | Custom gas price for upload transactions (in wei as string) |
 
-## 🔑 Key-Value Storage Options
+### Key-Value Storage Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -351,7 +286,7 @@ try {
 | `retries` | number | `3` | Number of retry attempts |
 | `gasPrice` | string | - | Custom gas price for KV transactions (in wei as string) |
 
-## 🌊 Stream Storage Options
+### Stream Storage Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -375,6 +310,40 @@ const result = await uploadFile('./file.txt', {
 const result = await uploadFileWithGas('./file.txt', '10000000'); // 10 gwei
 ```
 
+---
+
+## ⚙️ Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `privateKey` | string | **required** | Your EVM private key (0x-prefixed) |
+| `rpcUrl` | string | `https://evmrpc-testnet.0g.ai` | 0G network RPC endpoint |
+| `indexerRpcUrl` | string | `https://indexer-storage-testnet-turbo.0g.ai` | 0G storage indexer RPC endpoint |
+| `autoDeposit` | boolean | `true` | Automatically deposit 0.1 OG on initialization |
+| `defaultModel` | string | `deepseek-chat` | Default AI model to use |
+| `timeout` | number | `30000` | Request timeout in milliseconds |
+| `retries` | number | `3` | Number of retry attempts |
+| `logLevel` | string | `info` | Logging level (`debug`, `info`, `warn`, `error`, `silent`) |
+
+## 🔧 Error Handling
+
+The SDK provides clear error types:
+
+```javascript
+import { ConfigurationError, NetworkError, InsufficientFundsError } from '0g-kit';
+
+try {
+  const response = await chat('Hello');
+} catch (error) {
+  if (error instanceof ConfigurationError) {
+    console.log('Configuration issue:', error.message);
+  } else if (error instanceof InsufficientFundsError) {
+    console.log('Need more funds:', error.message);
+  } else if (error instanceof NetworkError) {
+    console.log('Network issue:', error.message);
+  }
+}
+```
 
 ## 🛠️ Development
 
