@@ -9,6 +9,7 @@ export {
   initZeroG,
   useDeepseek,
   useLlama,
+  useQwen,
   getAvailableModels,
 
 } from './core/inference.js';

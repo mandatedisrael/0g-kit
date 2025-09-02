@@ -465,6 +465,126 @@ export async function useLlama(message: string, options: Omit<ChatOptions, 'mode
   }
 }
 
+export async function useQwen(message: string, options: Omit<ChatOptions, 'model' | 'provider'> = {}): Promise<string> {
+  const startTime = Date.now();
+  const requestId = uuidv4();
+  
+  try {
+    validateChatMessage(message);
+    await ensureInitialized();
+    
+    logger.info('Qwen request started', { 
+      requestId, 
+      messageLength: message.length
+    });
+
+    const providerAddress = await findModelProvider('qwen');
+    
+    const broker = await globalClient!.getBroker();
+    
+    await withRetry(async () => {
+      logger.debug('Acknowledging Qwen provider...');
+      await broker.inference.acknowledgeProviderSigner(providerAddress);
+    }, options.retries || 3);
+
+    const { endpoint, model } = await withRetry(async () => {
+      logger.debug('Getting Qwen service metadata...');
+      return await broker.inference.getServiceMetadata(providerAddress);
+    }, options.retries || 3);
+
+    const headers = await withRetry(async () => {
+      logger.debug('Getting Qwen request headers...');
+      return await broker.inference.getRequestHeaders(providerAddress, message);
+    }, options.retries || 3);
+
+    const sdkTimeout = (globalClient?.getConfig().timeout) ?? 30000;
+    const timeout = options.timeout ?? sdkTimeout;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      logger.warn('Qwen request timeout, aborting...', { requestId, timeout });
+      controller.abort();
+    }, timeout);
+
+    try {
+      logger.debug('Sending Qwen inference request...', { endpoint, model });
+      
+      const response = await fetch(`${endpoint}/chat/completions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...headers },
+        body: JSON.stringify({
+          messages: [{ role: "user", content: message }],
+          model: model, 
+          temperature: options.temperature,
+          max_tokens: options.maxTokens,
+        }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        logger.error(`Qwen HTTP ${response.status}: ${errorText}`, undefined, { requestId });
+        
+        if (response.status === 402 || response.status === 403) {
+          throw new InsufficientFundsError('Insufficient funds for Qwen inference request');
+        }
+        
+        throw new NetworkError(`Qwen service error: HTTP ${response.status}`);
+      }
+
+      const data = await response.json() as any;
+      const content = data.choices?.[0]?.message?.content;
+      
+      if (!content || content.trim() === '') {
+        logger.warn('Qwen returned empty content, checking for alternative response formats', { requestId, data });
+        
+        const toolCalls = data.choices?.[0]?.message?.tool_calls;
+        if (toolCalls && toolCalls.length > 0) {
+          logger.info('Qwen response contains tool calls', { requestId, toolCalls });
+          return `[Tool calls available: ${toolCalls.length} tools]`;
+        }
+        
+        const reasoningContent = data.choices?.[0]?.message?.reasoning_content;
+        if (reasoningContent) {
+          logger.info('Qwen response contains reasoning content', { requestId });
+          return reasoningContent;
+        }
+        
+        logger.warn('Qwen returned no usable content, returning default message', { requestId, data });
+        return 'I received your message but was unable to generate a response at this time.';
+      }
+
+      const duration = Date.now() - startTime;
+      logger.info('Qwen request completed', { 
+        requestId, 
+        duration,
+        responseLength: content.length,
+        provider: providerAddress
+      });
+
+      return content;
+
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
+  } catch (error) {
+    const duration = Date.now() - startTime;
+    logger.error('Qwen request failed', error as Error, { requestId, duration });
+    
+    if ((error as any).name === 'AbortError') {
+      throw new NetworkError(`Qwen request timed out after ${options.timeout || 30000}ms`, error as Error);
+    }
+    
+    if (error instanceof ConfigurationError || error instanceof NetworkError || error instanceof InsufficientFundsError) {
+      throw error;
+    }
+    
+    throw new NetworkError('Unexpected error during Qwen request', error as Error);
+  }
+}
+
 export async function deposit(amount: number): Promise<void> {
   await ensureInitialized();
   return await globalClient!.deposit(amount);

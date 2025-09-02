@@ -78,7 +78,7 @@ The 0G Kit abstracts away the following complex technical details:
 ```javascript
 
 // Compute-only imports  
-import { chat, useDeepseek, useLlama } from '0g-kit';
+import { chat, useDeepseek, useLlama, useQwen } from '0g-kit';
 
 // Storage-only imports
 import { uploadFile, downloadFile, uploadFileWithGas, uploadKeyValueFile, downloadKeyValueFile, uploadStream, downloadStream } from '0g-kit/storage';
@@ -108,6 +108,12 @@ const response = await useDeepseek('Hello, how are you?')
 // Use Llama model specifically
 import { useLlama } from '0g-kit';
 const response = await useLlama('Hello, how are you?')
+```
+
+```javascript
+// Use Qwen model specifically
+import { useQwen } from '0g-kit';
+const response = await useQwen('Hello, how are you?')
 ```
 
 ## Service Discovery
