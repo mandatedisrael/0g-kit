@@ -172,8 +172,8 @@ export class ZeroGKit {
 
       if (this.config.autoDeposit && !this.autoDepositCompleted) {
         try {
-          logger.info('Depositing 0.05 OG to activate the account ( ~ 5,000 requests/0.05 OG)');
-          await this.broker.ledger.addLedger(0.05);
+          logger.info('Depositing 3 OG to activate the account (minimum required for inference)');
+          await this.broker.ledger.addLedger(3);
           logger.info('Ledger activated successfully');
           this.autoDepositCompleted = true;
           
